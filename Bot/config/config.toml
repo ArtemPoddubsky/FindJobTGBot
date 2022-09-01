@@ -1,0 +1,10 @@
+token = "<PUT_YOUR_TG_TOKEN_HERE>"
+host = "localhost"
+[server]
+    port = "8080"
+[db]
+    host = "db"
+    port = "5432"
+    username = "Artem"
+    password = "55555"
+    database = "tgbot"
