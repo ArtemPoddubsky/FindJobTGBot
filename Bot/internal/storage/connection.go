@@ -22,33 +22,22 @@ func NewDB(cfg config.Config) *Postgres {
 }
 
 func Connect(psqlconn string) *pgxpool.Pool {
-	var pool *pgxpool.Pool
-	var err error
-	err = TryToConnect(func() error {
-		ctx, cancel := context.WithTimeout(context.Background(), Delay)
-		defer cancel()
-		pool, err = pgxpool.Connect(ctx, psqlconn)
-		if err != nil {
-			return err
+	for count, attempt := 1, Attempts; attempt > 0; {
+		if count != 1 {
+			log.Warnf("Trying to connect to database %d time", count)
 		}
-		return nil
-	})
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-	return pool
-}
-
-func TryToConnect(fn func() error) (err error) {
-	for count, j := 1, Attempts; j > 0; {
-		log.Warnf("Trying to connect to database %d time", count)
-		if err = fn(); err != nil {
+		ctx, cancel := context.WithTimeout(context.Background(), Delay)
+		pool, err := pgxpool.Connect(ctx, psqlconn)
+		if err != nil {
+			cancel()
 			time.Sleep(Delay)
+			attempt--
 			count++
-			j--
 			continue
 		}
-		return nil
+		cancel()
+		return pool
 	}
-	return
+	log.Fatalln("Couldn't connect to database ")
+	return nil
 }
