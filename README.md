@@ -1,4 +1,4 @@
-# HeadHunter Telegram Bot
+# FindJob Telegram Bot
 A simple telegram bot written in Golang which can send you vacancies using HH API and save those in history. <a href=https://t.me/InternshipGolangBot>@BotLink</a>
 
 <h2>Overview</h2>
