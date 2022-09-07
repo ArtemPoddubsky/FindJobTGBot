@@ -11,6 +11,7 @@ import (
 	"net/url"
 )
 
+const Repeat = "Используйте /repeat чтобы посмотреть следующие 7 вакансий"
 const VacPerRequest = 7
 
 func (a *App) StartSearch(id int64, text string) {
@@ -21,7 +22,7 @@ func (a *App) StartSearch(id int64, text string) {
 	if err := a.Search(id, req, parser.ParseExp(text)); err != nil {
 		utils.Error(fmt.Errorf("Search: %v ", err), text)
 	}
-	if err := a.SendMessage(id, utils.Repeat); err != nil {
+	if err := a.SendMessage(id, Repeat); err != nil {
 		utils.Error(fmt.Errorf("Send /repeat prompt: %v ", err), text)
 	}
 }

@@ -10,6 +10,8 @@ import (
 	"sync"
 )
 
+const Help = "Начать: название вакансии\nПоиск по последнему запросу: /repeat\nОчистить историю поиска: /clear"
+
 type App struct {
 	config config.Config
 	db     *storage.Postgres
@@ -63,7 +65,7 @@ func (a *App) Handler(id int64, msg string) {
 		a.ClearHistory(id)
 		break
 	case "/help":
-		if err := a.SendMessage(id, utils.Help); err != nil {
+		if err := a.SendMessage(id, Help); err != nil {
 			utils.Error(fmt.Errorf("Help: %v ", err))
 		}
 		break
