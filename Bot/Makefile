@@ -1,2 +1,2 @@
 all:
-	@ go build -o bot ./cmd/main/main.go
+	@ go build -o bot ./cmd/bot/main.go
