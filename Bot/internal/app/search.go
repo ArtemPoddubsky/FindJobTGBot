@@ -12,7 +12,7 @@ import (
 const Repeat = "Используйте /repeat чтобы посмотреть следующие 7 вакансий"
 const VacPerRequest = 7
 
-func (a *App) StartSearch(id int64, text string) { // Search
+func (a *App) StartSearch(id int64, text string) {
 	a.Mutex.RLock()
 	req := a.Req[id]
 	delete(a.Req, id)
