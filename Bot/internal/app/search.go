@@ -26,37 +26,38 @@ func (a *App) StartSearch(id int64, text string) {
 }
 
 func (a *App) Search(chatID int64, title, exp string) error {
-	s, err := GetVacancies(title, exp)
-	if err != nil {
-		return err
+	s, errJson := GetVacancies(title, exp)
+	if errJson != nil {
+		return errJson
 	}
 	count := 0
 	for i := range s.Items {
 		if count == VacPerRequest {
 			break
 		}
-		unique, err2 := a.db.CheckOriginal(chatID, s.Items[i].Url)
-		if err2 != nil {
-			return err2
+		unique, err := a.db.CheckOriginal(chatID, s.Items[i].Url)
+		if err != nil {
+			return err
 		} else if !unique {
 			continue
 		}
-		err2 = a.db.AddRecord(chatID, s.Items[i].Url)
-		if err2 != nil {
-			return err2
+		if err = a.db.AddRecord(chatID, s.Items[i].Url); err != nil {
+			return err
 		}
-		if err2 = a.SendVacancy(chatID, s.Items[i], parser.ParseSalary(s.Items[i].Salary)); err != nil {
+		if err = a.SendVacancy(chatID, s.Items[i], parser.ParseSalary(s.Items[i].Salary)); err != nil {
 			return err
 		}
 		count++
 	}
 	if count == 0 {
-		return a.SendMessage(chatID, "По данному запросу не найдено новых вакансий")
+		if err := a.SendMessage(chatID, "По данному запросу не найдено новых вакансий"); err != nil {
+			return err
+		}
 	}
 	return a.db.AddLast(chatID, title, exp)
 }
 
-func GetVacancies(title, exp string) (parser.Vacancies, error) {
+func GetVacancies(title, exp string) (*parser.Vacancies, error) {
 	params := url.Values{}
 	params.Add("text", title)
 	params.Add("area", "1")
@@ -66,7 +67,7 @@ func GetVacancies(title, exp string) (parser.Vacancies, error) {
 	var s parser.Vacancies
 	resp, err := http.Get("https://api.hh.ru/vacancies?" + params.Encode())
 	if err != nil {
-		return s, err
+		return nil, err
 	}
-	return s, json.NewDecoder(resp.Body).Decode(&s)
+	return &s, json.NewDecoder(resp.Body).Decode(&s)
 }
