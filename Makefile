@@ -22,3 +22,5 @@ clean: stop
 
 fclean: clean
 	@-rm -rf /var/tmp/docker
+
+re: clean all

@@ -1,7 +1,6 @@
 package app
 
 import (
-	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	log "github.com/sirupsen/logrus"
 	"main/internal/config"
@@ -55,7 +54,7 @@ func (a *App) Handler(id int64, msg string) {
 	switch msg {
 	case "/start":
 		if err := a.SendMessage(id, "Введите название вакансии"); err != nil {
-			utils.Error(fmt.Errorf("Send /start prompt: %v ", err))
+			log.Errorln("Send /start prompt:", err)
 		}
 		break
 	case "/repeat":
@@ -66,7 +65,7 @@ func (a *App) Handler(id int64, msg string) {
 		break
 	case "/help":
 		if err := a.SendMessage(id, Help); err != nil {
-			utils.Error(fmt.Errorf("Help: %v ", err))
+			log.Errorln("Help:", err)
 		}
 		break
 	case "Не важно", "Нет опыта", "От 1 до 3 лет", "От 3 до 6 лет", "Более 6 лет":
@@ -77,9 +76,8 @@ func (a *App) Handler(id int64, msg string) {
 		a.Req[id] = msg
 		a.Mutex.Unlock()
 		if err := a.SendKeyboard(id); err != nil {
-			utils.Error(fmt.Errorf("Send keyboard: %v ", err), msg)
+			utils.FieldError("Send keyboard:", err, msg)
 		}
 		break
 	}
-	log.Traceln("Reply sent", msg)
 }

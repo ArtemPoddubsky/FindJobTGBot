@@ -4,12 +4,9 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func Error(err error, request ...string) {
-	if request == nil {
-		log.Errorln(err)
-	} else {
-		log.WithFields(log.Fields{
-			"request": request[0],
-		}).Errorln(err)
+func FieldError(detail string, err error, request string) {
+	var fields = log.Fields{
+		"request": request,
 	}
+	log.WithFields(fields).Errorln(detail, err)
 }
