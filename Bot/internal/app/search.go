@@ -7,6 +7,7 @@ import (
 	"main/internal/utils"
 	"net/http"
 	"net/url"
+	"time"
 )
 
 const Repeat = "Используйте /repeat чтобы посмотреть следующие 7 вакансий"
@@ -64,10 +65,13 @@ func GetVacancies(title, exp string) (*parser.Vacancies, error) {
 	if exp != "" {
 		params.Add("experience", exp)
 	}
-	var s parser.Vacancies
-	resp, err := http.Get("https://api.hh.ru/vacancies?" + params.Encode())
+	client := &http.Client{Timeout: 2 * time.Second}
+	resp, err := client.Get("https://api.hh.ru/vacancies?" + params.Encode())
 	if err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
+
+	var s parser.Vacancies
 	return &s, json.NewDecoder(resp.Body).Decode(&s)
 }
