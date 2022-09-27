@@ -9,8 +9,9 @@ import (
 	"sync"
 )
 
-const Help = "Начать: название вакансии\nПоиск по последнему запросу: /repeat\nОчистить историю поиска: /clear"
+const help = "Начать: название вакансии\nПоиск по последнему запросу: /repeat\nОчистить историю поиска: /clear"
 
+// App holds configuration data, storage and bot instance and map for holding request information.
 type App struct {
 	config *config.Config
 	db     *storage.Postgres
@@ -19,6 +20,7 @@ type App struct {
 	Req    map[int64]string
 }
 
+// NewApp returns new instance of App.
 func NewApp(cfg *config.Config) *App {
 	return &App{
 		config: cfg,
@@ -41,6 +43,7 @@ func createBot(token string) *tgbotapi.BotAPI {
 	return b
 }
 
+// Run starts updates loop.
 func (a *App) Run() {
 	log.Infoln("Running")
 
@@ -55,10 +58,11 @@ func (a *App) Run() {
 	}
 }
 
+// Handler parses requested message and calls corresponding methods.
 func (a *App) Handler(id int64, msg string) {
 	switch msg {
 	case "/start":
-		if err := a.SendMessage(id, "Введите название вакансии"); err != nil {
+		if err := a.sendMessage(id, "Введите название вакансии"); err != nil {
 			log.Errorln("/start: ", err)
 		}
 	case "/repeat":
@@ -66,8 +70,8 @@ func (a *App) Handler(id int64, msg string) {
 	case "/clear":
 		a.ClearHistory(id)
 	case "/help":
-		if err := a.SendMessage(id, Help); err != nil {
-			log.Errorln("Help:", err)
+		if err := a.sendMessage(id, help); err != nil {
+			log.Errorln("help:", err)
 		}
 	case "Не важно", "Нет опыта", "От 1 до 3 лет", "От 3 до 6 лет", "Более 6 лет":
 		a.StartSearch(id, msg)
@@ -76,7 +80,7 @@ func (a *App) Handler(id int64, msg string) {
 		a.Req[id] = msg
 		a.Mutex.Unlock()
 
-		if err := a.SendKeyboard(id); err != nil {
+		if err := a.sendKeyboard(id); err != nil {
 			utils.FieldError("Send keyboard:", err, msg)
 		}
 	}

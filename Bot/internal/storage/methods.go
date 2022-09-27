@@ -8,17 +8,18 @@ import (
 )
 
 const (
-	AddLastTimeout       = 2 * time.Second
-	GetLastTimeout       = 2 * time.Second
-	CheckOriginalTimeout = 2 * time.Second
-	AddRecordTimeout     = 2 * time.Second
-	ClearHistoryTimeout  = 2 * time.Second
+	addLastTimeout       = 2 * time.Second
+	getLastTimeout       = 2 * time.Second
+	checkOriginalTimeout = 2 * time.Second
+	addRecordTimeout     = 2 * time.Second
+	clearHistoryTimeout  = 2 * time.Second
 )
 
 var errUpdate = errors.New("couldn't update last request ")
 
+// AddLast updates or adds last formed request in database.
 func (db Postgres) AddLast(chatID int64, title, exp string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), AddLastTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), addLastTimeout)
 	defer cancel()
 
 	res, err := db.pool.Exec(ctx,
@@ -36,8 +37,9 @@ func (db Postgres) AddLast(chatID int64, title, exp string) error {
 	return nil
 }
 
+// GetLast gets last formed request for specific user.
 func (db Postgres) GetLast(chatID int64) (string, string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), GetLastTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), getLastTimeout)
 	defer cancel()
 
 	row := db.pool.QueryRow(ctx,
@@ -52,8 +54,9 @@ func (db Postgres) GetLast(chatID int64) (string, string, error) {
 	return title, exp, nil
 }
 
+// CheckOriginal checks if vacancy's url appeared in request history for specific user.
 func (db Postgres) CheckOriginal(chatID int64, url string) (bool, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), CheckOriginalTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), checkOriginalTimeout)
 	defer cancel()
 
 	res, err := db.pool.Exec(ctx,
@@ -68,8 +71,9 @@ func (db Postgres) CheckOriginal(chatID int64, url string) (bool, error) {
 	return false, nil
 }
 
+// AddRecord adds vacancy's url to user requests history.
 func (db Postgres) AddRecord(chatID int64, url string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), AddRecordTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), addRecordTimeout)
 	defer cancel()
 
 	if _, err := db.pool.Exec(ctx,
@@ -80,8 +84,9 @@ func (db Postgres) AddRecord(chatID int64, url string) error {
 	return nil
 }
 
+// ClearHistory clears user requests history.
 func (db Postgres) ClearHistory(chatID int64) error {
-	ctx, cancel := context.WithTimeout(context.Background(), ClearHistoryTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), clearHistoryTimeout)
 	defer cancel()
 
 	if _, err := db.pool.Exec(ctx,

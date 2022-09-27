@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+// Config stores all information from config file.
 type Config struct {
 	Token  string `toml:"token"`
 	Host   string `toml:"host"`
@@ -20,6 +21,7 @@ type Config struct {
 	} `toml:"database"`
 }
 
+// GetConfig reads configuration file and stores it in Config.
 func GetConfig() Config {
 	viper.SetConfigName("config")
 	viper.AddConfigPath("./config/")

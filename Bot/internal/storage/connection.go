@@ -9,32 +9,34 @@ import (
 	"time"
 )
 
-const Attempts = 8
-const Delay = 5 * time.Second
+const attempts = 8
+const delay = 5 * time.Second
 
+// Postgres holds a pool of connections and methods to interact with database.
 type Postgres struct {
 	pool *pgxpool.Pool
 }
 
+// NewDB connects to database and returns a new Postgres instance.
 func NewDB(cfg *config.Config) *Postgres {
 	psqlconn := fmt.Sprintf("postgres://%v:%v@%v:%v/%v?sslmode=disable",
 		cfg.DB.Username, cfg.DB.Password, cfg.DB.Host, cfg.DB.Port, cfg.DB.Database)
 
-	return &Postgres{Connect(psqlconn)}
+	return &Postgres{connect(psqlconn)}
 }
 
-func Connect(psqlconn string) *pgxpool.Pool {
-	for count, attempt := 1, Attempts; attempt > 0; {
+func connect(psqlconn string) *pgxpool.Pool {
+	for count, attempt := 1, attempts; attempt > 0; {
 		if count != 1 {
 			log.Warnf("Trying to connect to database %d time", count)
 		}
 
-		ctx, cancel := context.WithTimeout(context.Background(), Delay)
+		ctx, cancel := context.WithTimeout(context.Background(), delay)
 		pool, err := pgxpool.Connect(ctx, psqlconn)
 
 		if err != nil {
 			cancel()
-			time.Sleep(Delay)
+			time.Sleep(delay)
 			attempt--
 			count++
 

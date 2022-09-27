@@ -6,7 +6,7 @@ import (
 	"main/internal/app/parser"
 )
 
-func (a *App) SendMessage(chatID int64, message string) error {
+func (a *App) sendMessage(chatID int64, message string) error {
 	msg := tgbotapi.NewMessage(chatID, message)
 	msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
 
@@ -17,7 +17,7 @@ func (a *App) SendMessage(chatID int64, message string) error {
 	return nil
 }
 
-func (a *App) SendKeyboard(chatID int64) error {
+func (a *App) sendKeyboard(chatID int64) error {
 	keyboard := tgbotapi.NewReplyKeyboard(
 		tgbotapi.NewKeyboardButtonRow(
 			tgbotapi.NewKeyboardButton("Нет опыта"),
@@ -38,7 +38,7 @@ func (a *App) SendKeyboard(chatID int64) error {
 	return nil
 }
 
-func (a *App) SendVacancy(chatID int64, vacancy *parser.Vacancy, salary string) error {
+func (a *App) sendVacancy(chatID int64, vacancy *parser.Vacancy, salary string) error {
 	msg := tgbotapi.NewMessage(chatID, vacancy.Employer.Name+" . "+vacancy.Name+"\n"+salary+"\n"+vacancy.URL+"\n")
 
 	if _, err := a.Bot.Send(msg); err != nil {

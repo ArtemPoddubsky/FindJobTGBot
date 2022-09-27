@@ -10,6 +10,6 @@ func main() {
 	log.Infoln("Building")
 
 	cfg := config.GetConfig()
-
-	app.NewApp(&cfg).Run()
+	application := app.NewApp(&cfg)
+	application.Run()
 }

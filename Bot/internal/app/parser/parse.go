@@ -2,10 +2,12 @@ package parser
 
 import "strconv"
 
+// Vacancies stores all vacancies.
 type Vacancies struct {
 	Items []Vacancy `json:"items"`
 }
 
+// Vacancy stores all data about vacancy.
 type Vacancy struct {
 	Name     string   `json:"name"`
 	Area     Area     `json:"area"`
@@ -14,20 +16,24 @@ type Vacancy struct {
 	Employer Employer `json:"employer"`
 }
 
+// Area is exported to add ability to parse City string.
 type Area struct {
 	City string `json:"name"`
 }
 
+// Salary is exported to parse salary string.
 type Salary struct {
 	From     int    `json:"from"`
 	To       int    `json:"to"`
 	Currency string `json:"currency"`
 }
 
+// Employer is exported to add ability to parse employer's name string.
 type Employer struct {
 	Name string `json:"name"`
 }
 
+// ParseSalary parses salary string to form request to HH API.
 func ParseSalary(salary Salary) string {
 	from := strconv.Itoa(salary.From)
 	if from == "0" {
@@ -50,6 +56,7 @@ func ParseSalary(salary Salary) string {
 	return "Зарплата: " + from + to + salary.Currency
 }
 
+// ParseExp parses experience string to form request to HH API.
 func ParseExp(req string) string {
 	switch req {
 	case "Нет опыта":

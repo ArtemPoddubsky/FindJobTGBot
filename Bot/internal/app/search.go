@@ -13,36 +13,39 @@ import (
 )
 
 const (
-	Repeat        = "Используйте /repeat чтобы посмотреть следующие 7 вакансий"
-	VacPerRequest = 7
+	repeat        = "Используйте /repeat чтобы посмотреть следующие 7 вакансий"
+	vacPerRequest = 7
 	reqTimeout    = 2 * time.Second
 )
 
+// StartSearch forms request by accessing in-memory storage,
+// calls HH API with formed request, sends unique vacancies if found
+// and sends prompt for /repeat.
 func (a *App) StartSearch(id int64, text string) {
 	a.Mutex.RLock()
 	req := a.Req[id]
 	delete(a.Req, id)
 	a.Mutex.RUnlock()
 
-	if err := a.Search(id, req, parser.ParseExp(text)); err != nil {
-		utils.FieldError("Search:", err, text)
+	if err := a.search(id, req, parser.ParseExp(text)); err != nil {
+		utils.FieldError("search:", err, text)
 	}
 
-	if err := a.SendMessage(id, Repeat); err != nil {
-		log.Errorln("SendMessage", err)
+	if err := a.sendMessage(id, repeat); err != nil {
+		log.Errorln("sendMessage", err)
 	}
 }
 
-func (a *App) Search(chatID int64, title, exp string) error {
-	vacancies, errJSON := GetVacancies(title, exp)
+func (a *App) search(chatID int64, title, exp string) error {
+	vacancies, errJSON := getVacancies(title, exp)
 
 	if errJSON != nil {
-		return fmt.Errorf("GetVacancies: %w", errJSON)
+		return fmt.Errorf("getVacancies: %w", errJSON)
 	}
 
 	count := 0
 	for i := range vacancies.Items {
-		if count == VacPerRequest {
+		if count == vacPerRequest {
 			break
 		}
 
@@ -57,15 +60,15 @@ func (a *App) Search(chatID int64, title, exp string) error {
 			return fmt.Errorf("AddRecord: %w", err)
 		}
 
-		if err := a.SendVacancy(chatID, &vacancies.Items[i], parser.ParseSalary(vacancies.Items[i].Salary)); err != nil {
-			return fmt.Errorf("SendVacancy: %w", err)
+		if err := a.sendVacancy(chatID, &vacancies.Items[i], parser.ParseSalary(vacancies.Items[i].Salary)); err != nil {
+			return fmt.Errorf("sendVacancy: %w", err)
 		}
 		count++
 	}
 
 	if count == 0 {
-		if err := a.SendMessage(chatID, "По данному запросу не найдено новых вакансий"); err != nil {
-			return fmt.Errorf("SendMessage: %w", err)
+		if err := a.sendMessage(chatID, "По данному запросу не найдено новых вакансий"); err != nil {
+			return fmt.Errorf("sendMessage: %w", err)
 		}
 	}
 
@@ -76,7 +79,7 @@ func (a *App) Search(chatID int64, title, exp string) error {
 	return nil
 }
 
-func GetVacancies(title, exp string) (*parser.Vacancies, error) {
+func getVacancies(title, exp string) (*parser.Vacancies, error) {
 	params := url.Values{}
 	params.Add("text", title)
 	params.Add("area", "1")
