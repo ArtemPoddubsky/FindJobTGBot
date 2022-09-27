@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"main/internal/app/parser"
 )
@@ -8,8 +9,12 @@ import (
 func (a *App) SendMessage(chatID int64, message string) error {
 	msg := tgbotapi.NewMessage(chatID, message)
 	msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
-	_, err := a.Bot.Send(msg)
-	return err
+
+	if _, err := a.Bot.Send(msg); err != nil {
+		return fmt.Errorf("Bot.Send: %w", err)
+	}
+
+	return nil
 }
 
 func (a *App) SendKeyboard(chatID int64) error {
@@ -25,12 +30,20 @@ func (a *App) SendKeyboard(chatID int64) error {
 	)
 	msg := tgbotapi.NewMessage(chatID, "Выберите ваш опыт работы")
 	msg.ReplyMarkup = keyboard
-	_, err := a.Bot.Send(msg)
-	return err
+
+	if _, err := a.Bot.Send(msg); err != nil {
+		return fmt.Errorf("Bot.Send: %w", err)
+	}
+
+	return nil
 }
 
-func (a *App) SendVacancy(chatID int64, vacancy parser.Vacancy, salary string) error {
-	msg := tgbotapi.NewMessage(chatID, vacancy.Employer.Name+" . "+vacancy.Name+"\n"+salary+"\n"+vacancy.Url+"\n")
-	_, err := a.Bot.Send(msg)
-	return err
+func (a *App) SendVacancy(chatID int64, vacancy *parser.Vacancy, salary string) error {
+	msg := tgbotapi.NewMessage(chatID, vacancy.Employer.Name+" . "+vacancy.Name+"\n"+salary+"\n"+vacancy.URL+"\n")
+
+	if _, err := a.Bot.Send(msg); err != nil {
+		return fmt.Errorf("Bot.Send: %w", err)
+	}
+
+	return nil
 }

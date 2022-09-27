@@ -8,6 +8,8 @@ import (
 
 func main() {
 	log.Infoln("Building")
+
 	cfg := config.GetConfig()
-	app.NewApp(cfg).Run()
+
+	app.NewApp(&cfg).Run()
 }

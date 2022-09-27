@@ -8,5 +8,6 @@ func FieldError(detail string, err error, request string) {
 	var fields = log.Fields{
 		"request": request,
 	}
+
 	log.WithFields(fields).Errorln(detail, err)
 }

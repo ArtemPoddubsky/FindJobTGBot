@@ -11,7 +11,7 @@ type Config struct {
 	Server struct {
 		Port string `toml:"port"`
 	} `toml:"server"`
-	Db struct {
+	DB struct {
 		Host     string `toml:"host"`
 		Port     string `toml:"port"`
 		Username string `toml:"username"`
@@ -24,13 +24,15 @@ func GetConfig() Config {
 	viper.SetConfigName("config")
 	viper.AddConfigPath("./config/")
 	viper.SetConfigType("toml")
+
 	if err := viper.ReadInConfig(); err != nil {
 		log.Fatalln(err)
 	}
+
 	var cfg Config
-	err := viper.Unmarshal(&cfg)
-	if err != nil {
+	if err := viper.Unmarshal(&cfg); err != nil {
 		log.Fatalln(err)
 	}
+
 	return cfg
 }

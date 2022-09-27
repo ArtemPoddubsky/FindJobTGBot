@@ -1,0 +1,82 @@
+linters:
+  enable-all: true
+  disable:
+    - cyclop
+    - deadcode
+    - exhaustruct
+    - exhaustivestruct
+    - gci
+    - goimports
+    - gofumpt
+    - golint
+    - ifshort
+    - interfacer
+    - maligned
+    - nlreturn
+    - nosnakecase
+    - nonamedreturns
+    - paralleltest
+    - rowserrcheck
+    - scopelint
+    - sqlclosecheck
+    - structcheck
+    - varcheck
+    - wastedassign
+
+linters-settings:
+  errcheck:
+    check-type-assertions: true
+  goconst:
+    min-len: 2
+    min-occurrences: 3
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - experimental
+      - opinionated
+      - performance
+      - style
+    disabled-checks:
+      - unnamedResult
+  gomnd:
+    settings:
+      mnd:
+        checks: argument,case,condition,return
+  nestif:
+    min-complexity: 15
+  nolintlint:
+    require-explanation: true
+    require-specific: true
+  tagliatelle:
+    case:
+      rules:
+        json: snake
+
+  varnamelen:
+    max-distance: 10
+    ignore-decls:
+      - t testing.T
+      - r *http.Request
+      - w http.ResponseWriter
+      - to string
+      - i int
+      - id int64
+
+  issues:
+    fix: true
+    exclude-rules:
+      - path: _test\.go
+        linters:
+          - gocyclo
+          - gosec
+          - dupl
+          - varnamelen
+      - linters:
+          - stylecheck
+        text: 'branch statements should not be cuddled if block has more than two lines'
+
+    max-issues-per-linter: 0
+    max-same-issues: 0
+
+  run:
+    issues-exit-code: 1
