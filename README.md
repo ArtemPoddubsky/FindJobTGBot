@@ -18,3 +18,5 @@ A simple telegram bot written in Golang which can send you vacancies using HH AP
       # Put your Telegram Token (given by BotFather) into configuration file /Bot/config/config.toml
   
       make all
+      
+      make lint - Запуск линтера
